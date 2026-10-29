@@ -18,6 +18,16 @@ enum RecipeCategory: String, Codable, CaseIterable, Identifiable {
         case .sauce: "drop"
         }
     }
+
+    var iconName: String {
+        switch self {
+        case .starter: "CategoryStarter"
+        case .main: "CategoryMain"
+        case .snack: "CategorySnack"
+        case .dessert: "CategoryDessert"
+        case .sauce: "CategorySauce"
+        }
+    }
 }
 
 struct Recipe: Codable, Identifiable, Equatable {

@@ -10,6 +10,8 @@
 	<string>$(SUPABASE_ANON_KEY)</string>
 	<key>UIUserInterfaceStyle</key>
 	<string>Automatic</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UILaunchScreen</key>
 	<dict/>
 </dict>

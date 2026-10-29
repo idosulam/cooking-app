@@ -95,8 +95,7 @@ struct RecipeDetailView: View {
                     .strokeBorder(.white.opacity(0.42), lineWidth: 1)
                     .frame(width: 190, height: 190)
                     .offset(x: 220, y: 48)
-                Image(systemName: recipe.category.symbol)
-                    .font(.system(size: 76, weight: .ultraLight))
+                CategoryIcon(category: recipe.category, size: 104)
                     .foregroundStyle(Color.black.opacity(0.68))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 Text(recipe.category.rawValue.uppercased())
@@ -122,7 +121,11 @@ struct RecipeDetailView: View {
                 separator
                 Label("\(recipe.servings) servings", systemImage: "person.2")
                 separator
-                Label(recipe.category.rawValue, systemImage: recipe.category.symbol)
+                Label {
+                    Text(recipe.category.rawValue)
+                } icon: {
+                    CategoryIcon(category: recipe.category, size: 15)
+                }
             }
             .font(.caption.weight(.medium))
             .foregroundStyle(.secondary)

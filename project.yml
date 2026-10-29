@@ -17,6 +17,7 @@ targets:
     platform: iOS
     sources:
       - path: Sources
+      - path: Shared
     configFiles:
       Debug: Config/Debug.xcconfig
       Release: Config/Release.xcconfig
@@ -30,6 +31,32 @@ targets:
         INFOPLIST_FILE: Config/Info.plist
         GENERATE_INFOPLIST_FILE: YES
         ENABLE_PREVIEWS: YES
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
     dependencies:
       - package: Supabase
         product: Supabase
+      - target: RecipesWidgetExtension
+
+  RecipesWidgetExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: RecipesWidget
+      - path: Shared
+    info:
+      path: RecipesWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Recipes
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.idosulam.Recipes.Widget
+        SWIFT_VERSION: 5.0
+        TARGETED_DEVICE_FAMILY: "1"
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SKIP_INSTALL: YES

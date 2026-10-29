@@ -48,3 +48,17 @@ extension View {
             .background(RecipeTheme.card, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
     }
 }
+
+struct CategoryIcon: View {
+    let category: RecipeCategory
+    var size: CGFloat = 32
+
+    var body: some View {
+        Image(category.iconName)
+            .renderingMode(.template)
+            .resizable()
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .accessibilityHidden(true)
+    }
+}

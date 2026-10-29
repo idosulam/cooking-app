@@ -10,6 +10,13 @@ struct CookingView: View {
     @State private var isTimerRunning = false
     @State private var secondsRemaining = 0
     @State private var direction: CGFloat = 1
+    @AppStorage(RecipeAccent.storageKey) private var selectedAccent = RecipeAccent.tomato.rawValue
+    @State private var servings: Int
+
+    init(recipe: Recipe) {
+        self.recipe = recipe
+        _servings = State(initialValue: max(recipe.servings, 1))
+    }
 
     private enum Phase {
         case ingredients
@@ -48,6 +55,18 @@ struct CookingView: View {
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
+            CookingActivityManager.shared.end()
+        }
+        .onChange(of: phase) { _, newPhase in
+            switch newPhase {
+            case .ingredients: CookingActivityManager.shared.end()
+            case .steps: startActivity()
+            case .finished: CookingActivityManager.shared.finish()
+            }
+        }
+        .onChange(of: currentStep) { _, newStep in
+            guard phase == .steps else { return }
+            CookingActivityManager.shared.update(step: newStep)
         }
         .task(id: isTimerRunning) {
             guard isTimerRunning else { return }
@@ -126,7 +145,10 @@ struct CookingView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .padding(.top, 7)
-                .padding(.bottom, 22)
+                .padding(.bottom, 16)
+
+            servingsPicker
+                .padding(.bottom, 18)
 
             GeometryReader { proxy in
                 ZStack(alignment: .leading) {
@@ -206,6 +228,53 @@ struct CookingView: View {
             .padding(.bottom, 10)
         }
         .padding(.horizontal, 21)
+    }
+
+    private var scale: Double {
+        Double(servings) / Double(max(recipe.servings, 1))
+    }
+
+    private var servingsPicker: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "person.2")
+                .foregroundStyle(RecipeTheme.accent)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Servings").font(.subheadline.weight(.semibold))
+                if servings != recipe.servings {
+                    Text("Original recipe: \(recipe.servings)")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Spacer()
+            servingsButton("minus", label: "Fewer servings", disabled: servings <= 1) { servings -= 1 }
+            Text("\(servings)")
+                .font(.system(.title3, design: .rounded).weight(.semibold).monospacedDigit())
+                .frame(minWidth: 30)
+                .contentTransition(.numericText())
+            servingsButton("plus", label: "More servings", disabled: servings >= 99) { servings += 1 }
+        }
+        .padding(.horizontal, 15)
+        .padding(.vertical, 12)
+        .background(RecipeTheme.card, in: RoundedRectangle(cornerRadius: 17, style: .continuous))
+        .animation(.snappy, value: servings)
+    }
+
+    private func servingsButton(_ symbol: String, label: String, disabled: Bool, action: @escaping () -> Void) -> some View {
+        Button {
+            action()
+            Feedback.tap()
+        } label: {
+            Image(systemName: symbol)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(.white)
+                .frame(width: 36, height: 36)
+                .background(RecipeTheme.accent, in: Circle())
+        }
+        .buttonStyle(.plain)
+        .disabled(disabled)
+        .opacity(disabled ? 0.4 : 1)
+        .accessibilityLabel(label)
     }
 
     private var checklistProgress: CGFloat {
@@ -352,6 +421,11 @@ struct CookingView: View {
         .multilineTextAlignment(.center)
     }
 
+    private func startActivity() {
+        let accent = RecipeAccent(rawValue: selectedAccent)?.color ?? RecipeAccent.tomato.color
+        CookingActivityManager.shared.start(recipe: recipe, step: currentStep, accent: accent)
+    }
+
     private func advanceStep() {
         guard currentStep < recipe.steps.count else { return }
         isTimerRunning = false
@@ -399,7 +473,7 @@ struct CookingView: View {
 
     private func quantityDescription(_ ingredient: Ingredient) -> String {
         guard let quantity = ingredient.quantity else { return ingredient.unit }
-        let amount = quantity.formatted(.number.precision(.fractionLength(0...2)))
+        let amount = (quantity * scale).formatted(.number.precision(.fractionLength(0...2)))
         return ingredient.unit.isEmpty ? amount : "\(amount) \(ingredient.unit)"
     }
 }
