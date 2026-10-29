@@ -1,0 +1,56 @@
+
+    <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+      <defs>
+        <linearGradient id="bg_starter" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#7cbf64" />
+          <stop offset="100%" stop-color="#3b7a52" />
+        </linearGradient>
+        <filter id="shadow_starter" x="-20%" y="-20%" width="140%" height="140%">
+          <feDropShadow dx="0" dy="30" stdDeviation="24" flood-color="rgba(0,0,0,0.35)" />
+        </filter>
+      </defs>
+
+      <rect width="1024" height="1024" fill="#0c1226" />
+      <g filter="url(#shadow_starter)">
+        <rect x="120" y="120" rx="220" width="784" height="784" fill="url(#bg_starter)" />
+      </g>
+
+      
+    <g>
+      <ellipse cx="512" cy="690" rx="255" ry="40" fill="rgba(0,0,0,0.18)" />
+      <ellipse cx="512" cy="555" rx="265" ry="230" fill="#111c1d" />
+      <ellipse cx="512" cy="535" rx="230" ry="190" fill="#4eb060" />
+
+      <g fill="#f3f7ef">
+        <ellipse cx="270" cy="530" rx="34" ry="34" />
+        <ellipse cx="355" cy="610" rx="34" ry="34" />
+        <ellipse cx="446" cy="645" rx="34" ry="34" />
+        <ellipse cx="558" cy="645" rx="34" ry="34" />
+        <ellipse cx="638" cy="610" rx="34" ry="34" />
+        <ellipse cx="742" cy="530" rx="34" ry="34" />
+      </g>
+
+      <g fill="#f0563d">
+        <ellipse cx="310" cy="470" rx="26" ry="26" />
+        <ellipse cx="430" cy="420" rx="22" ry="22" />
+        <ellipse cx="556" cy="408" rx="20" ry="20" />
+        <ellipse cx="620" cy="430" rx="22" ry="22" />
+        <ellipse cx="718" cy="470" rx="26" ry="26" />
+      </g>
+
+      <g fill="#d5b45b">
+        <ellipse cx="198" cy="580" rx="22" ry="22" />
+        <ellipse cx="335" cy="695" rx="22" ry="22" />
+        <ellipse cx="500" cy="720" rx="22" ry="22" />
+        <ellipse cx="650" cy="710" rx="22" ry="22" />
+      </g>
+
+      <g fill="#4da85b">
+        <path d="M490 330 C540 300, 582 312, 612 340 C590 362, 548 378, 490 330 Z" />
+        <path d="M540 330 C578 312, 624 340, 652 352 C622 382, 576 390, 540 330 Z" />
+        <path d="M608 306 C642 284, 684 290, 704 332 C672 352, 642 338, 608 306 Z" />
+      </g>
+    </g>
+    
+    </svg>
+    

@@ -11,11 +11,11 @@ enum RecipeCategory: String, Codable, CaseIterable, Identifiable {
 
     var symbol: String {
         switch self {
-        case .starter: "leaf"
+        case .starter: "leaf.fill"
         case .main: "fork.knife"
-        case .snack: "takeoutbag.and.cup.and.straw"
-        case .dessert: "birthday.cake"
-        case .sauce: "drop"
+        case .snack: "bag.fill"
+        case .dessert: "birthday.cake.fill"
+        case .sauce: "drop.fill"
         }
     }
 }

@@ -239,15 +239,15 @@ struct RecipeEditorView: View {
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                     HStack {
-                        Text("\(draft.servings)")
-                            .font(.title3.weight(.semibold).monospacedDigit())
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
-                        Spacer(minLength: 4)
                         Stepper("Adjust servings", value: $draft.servings, in: 1...99)
                             .labelsHidden()
                             .fixedSize()
                             .accessibilityValue("\(draft.servings)")
+                        Spacer(minLength: 4)
+                        Text("\(draft.servings)")
+                            .font(.title3.weight(.semibold).monospacedDigit())
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
                 }
                 .padding(14)
@@ -802,6 +802,19 @@ struct RecipeEditorView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(12)
         .background(RecipeTheme.card, in: RoundedRectangle(cornerRadius: 13))
+    }
+
+    private func scaledQuantity(for ingredient: Ingredient, originalServings: Int, targetServings: Int) -> Double {
+        guard originalServings > 0, targetServings > 0, let quantity = ingredient.quantity else { return 0 }
+        let ratio = Double(targetServings) / Double(originalServings)
+        return quantity * ratio
+    }
+
+    private func displayQuantity(_ ingredient: Ingredient, for servings: Int) -> String {
+        guard let quantity = ingredient.quantity else { return ingredient.unit }
+        let value = scaledQuantity(for: ingredient, originalServings: max(1, draft.servings), targetServings: max(1, servings))
+        let formatted = value.formatted(.number.precision(.fractionLength(0...2)))
+        return ingredient.unit.isEmpty ? formatted : "\(formatted) \(ingredient.unit)"
     }
 
     private func ingredientBinding(_ index: Int, _ keyPath: WritableKeyPath<Ingredient, String>) -> Binding<String> {

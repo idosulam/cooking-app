@@ -277,11 +277,11 @@ private struct RecipeCard: View {
 
     private var tint: Color {
         switch recipe.category {
-        case .starter: Color(red: 0.87, green: 0.75, blue: 0.58)
-        case .main: Color(red: 0.68, green: 0.78, blue: 0.68)
-        case .snack: Color(red: 0.94, green: 0.79, blue: 0.47)
-        case .dessert: Color(red: 0.88, green: 0.68, blue: 0.62)
-        case .sauce: Color(red: 0.70, green: 0.79, blue: 0.83)
+        case .starter: Color(red: 0.76, green: 0.85, blue: 0.79)
+        case .main: Color(red: 0.67, green: 0.76, blue: 0.68)
+        case .snack: Color(red: 0.95, green: 0.83, blue: 0.55)
+        case .dessert: Color(red: 0.88, green: 0.72, blue: 0.70)
+        case .sauce: Color(red: 0.71, green: 0.80, blue: 0.90)
         }
     }
 
@@ -292,22 +292,22 @@ private struct RecipeCard: View {
                     RoundedRectangle(cornerRadius: 17, style: .continuous)
                         .fill(
                             LinearGradient(
-                                colors: [tint.opacity(0.56), tint.opacity(0.24)],
+                                colors: [tint.opacity(0.72), tint.opacity(0.28)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
                         )
                     Circle()
-                        .strokeBorder(.white.opacity(0.35), lineWidth: 1)
-                        .frame(width: 92, height: 92)
-                        .offset(x: 22, y: 22)
+                        .fill(.white.opacity(0.12))
+                        .frame(width: 96, height: 96)
+                        .offset(x: 18, y: 18)
                     Image(systemName: recipe.category.symbol)
-                        .font(.system(size: 29, weight: .light))
-                        .foregroundStyle(Color.black.opacity(0.68))
+                        .font(.system(size: 31, weight: .semibold))
+                        .foregroundStyle(.black.opacity(0.68))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     Image(systemName: "arrow.up.right")
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(.black.opacity(0.55))
+                        .foregroundStyle(.black.opacity(0.6))
                         .padding(9)
                 }
                 .frame(height: 112)
