@@ -11,11 +11,11 @@ struct RecipeDetailView: View {
 
     private var tint: Color {
         switch recipe.category {
-        case .starter: Color(red: 0.76, green: 0.85, blue: 0.79)
-        case .main: Color(red: 0.67, green: 0.76, blue: 0.68)
-        case .snack: Color(red: 0.95, green: 0.83, blue: 0.55)
-        case .dessert: Color(red: 0.88, green: 0.72, blue: 0.70)
-        case .sauce: Color(red: 0.71, green: 0.80, blue: 0.90)
+        case .starter: Color(red: 0.87, green: 0.75, blue: 0.58)
+        case .main: Color(red: 0.68, green: 0.78, blue: 0.68)
+        case .snack: Color(red: 0.94, green: 0.79, blue: 0.47)
+        case .dessert: Color(red: 0.88, green: 0.68, blue: 0.62)
+        case .sauce: Color(red: 0.70, green: 0.79, blue: 0.83)
         }
     }
 
@@ -90,19 +90,13 @@ struct RecipeDetailView: View {
         VStack(alignment: .leading, spacing: 17) {
             ZStack(alignment: .bottomLeading) {
                 RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [tint.opacity(0.85), tint.opacity(0.32)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .fill(LinearGradient(colors: [tint.opacity(0.75), tint.opacity(0.32)], startPoint: .topLeading, endPoint: .bottomTrailing))
                 Circle()
-                    .strokeBorder(.white.opacity(0.45), lineWidth: 1)
+                    .strokeBorder(.white.opacity(0.42), lineWidth: 1)
                     .frame(width: 190, height: 190)
                     .offset(x: 220, y: 48)
                 Image(systemName: recipe.category.symbol)
-                    .font(.system(size: 82, weight: .semibold))
+                    .font(.system(size: 76, weight: .ultraLight))
                     .foregroundStyle(Color.black.opacity(0.68))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 Text(recipe.category.rawValue.uppercased())
@@ -111,7 +105,7 @@ struct RecipeDetailView: View {
                     .foregroundStyle(.black.opacity(0.66))
                     .padding(.horizontal, 11)
                     .padding(.vertical, 8)
-                    .background(.white.opacity(0.42), in: Capsule())
+                    .background(.white.opacity(0.43), in: Capsule())
                     .padding(16)
             }
             .frame(height: 222)
