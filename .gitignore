@@ -1,0 +1,17 @@
+# Local Supabase credentials
+Config/Secrets.xcconfig
+Secrets.xcconfig
+
+# Xcode
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# Supabase local state
+supabase/.temp/
