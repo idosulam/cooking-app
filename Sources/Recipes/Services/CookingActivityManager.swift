@@ -27,9 +27,12 @@ final class CookingActivityManager {
         activity = try? Activity.request(attributes: attributes, content: content, pushType: nil)
     }
 
-    func update(step: Int) {
+    func update(step: Int, timerEnd: Date? = nil, timerPaused: Int? = nil) {
         guard let activity else { return }
-        let content = ActivityContent(state: state(for: step), staleDate: nil)
+        let content = ActivityContent(
+            state: state(for: step, timerEnd: timerEnd, timerPaused: timerPaused),
+            staleDate: timerEnd
+        )
         Task { await activity.update(content) }
     }
 
@@ -48,10 +51,21 @@ final class CookingActivityManager {
         Task { await activity.end(nil, dismissalPolicy: .immediate) }
     }
 
-    private func state(for step: Int) -> CookingActivityAttributes.ContentState {
+    private func state(
+        for step: Int,
+        timerEnd: Date? = nil,
+        timerPaused: Int? = nil
+    ) -> CookingActivityAttributes.ContentState {
         let index = min(max(step, 0), max(steps.count - 1, 0))
         var text = steps.indices.contains(index) ? steps[index] : ""
         if text.count > 140 { text = String(text.prefix(137)) + "…" }
-        return .init(step: index, totalSteps: steps.count, instruction: text, finished: false)
+        return .init(
+            step: index,
+            totalSteps: steps.count,
+            instruction: text,
+            finished: false,
+            timerEnd: timerEnd,
+            timerPaused: timerPaused
+        )
     }
 }

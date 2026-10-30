@@ -5,5 +5,6 @@ import WidgetKit
 struct RecipesWidgetBundle: WidgetBundle {
     var body: some Widget {
         CookingLiveActivity()
+        TodaysMealWidget()
     }
 }

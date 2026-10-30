@@ -32,6 +32,7 @@ struct RecipesApp: App {
                 configurationError: configurationError
             )
             .preferredColorScheme(nil)
+            .onOpenURL { AppRouter.shared.handle($0) }
         }
     }
 }

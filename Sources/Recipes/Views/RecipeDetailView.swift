@@ -8,6 +8,8 @@ struct RecipeDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var isCooking = false
     @State private var showsDeleteConfirmation = false
+    @State private var isPlanSheetPresented = false
+    @State private var planToast: String?
 
     private var tint: Color {
         switch recipe.category {
@@ -56,6 +58,21 @@ struct RecipeDetailView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Menu {
+                    Menu {
+                        Button("Today") { planMeal(on: .now) }
+                        Button("Tomorrow") {
+                            planMeal(on: Calendar.current.date(byAdding: .day, value: 1, to: .now) ?? .now)
+                        }
+                        Button("Choose date…") { isPlanSheetPresented = true }
+                        if MealPlanStore.meal(on: .now)?.recipeID == recipe.id {
+                            Button("Remove from today", role: .destructive) {
+                                MealPlanner.remove(on: .now)
+                                Feedback.tap()
+                            }
+                        }
+                    } label: {
+                        Label("Plan meal", systemImage: "calendar.badge.plus")
+                    }
                     Button {
                         onEdit()
                     } label: {
@@ -83,6 +100,39 @@ struct RecipeDetailView: View {
         }
         .fullScreenCover(isPresented: $isCooking) {
             CookingView(recipe: recipe)
+        }
+        .sheet(isPresented: $isPlanSheetPresented) {
+            PlanDateSheet { date in planMeal(on: date) }
+        }
+        .overlay(alignment: .top) {
+            if let planToast {
+                Label(planToast, systemImage: "checkmark.circle.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 11)
+                    .background(.regularMaterial, in: Capsule())
+                    .shadow(color: .black.opacity(0.12), radius: 10, y: 4)
+                    .padding(.top, 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+    }
+
+    private func planMeal(on date: Date) {
+        MealPlanner.plan(recipe, on: date)
+        Feedback.check()
+        let label: String
+        if Calendar.current.isDateInToday(date) {
+            label = "Planned for today"
+        } else if Calendar.current.isDateInTomorrow(date) {
+            label = "Planned for tomorrow"
+        } else {
+            label = "Planned for \(date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()))"
+        }
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.82)) { planToast = label }
+        Task {
+            try? await Task.sleep(for: .seconds(2))
+            withAnimation(.easeOut(duration: 0.3)) { planToast = nil }
         }
     }
 
@@ -243,5 +293,35 @@ private struct NutritionTile: View {
         .padding(11)
         .background(RecipeTheme.card, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .accessibilityElement(children: .combine)
+    }
+}
+
+private struct PlanDateSheet: View {
+    let onPlan: (Date) -> Void
+    @Environment(\.dismiss) private var dismiss
+    @State private var date = Date.now
+
+    var body: some View {
+        NavigationStack {
+            DatePicker("Day", selection: $date, in: Date.now..., displayedComponents: .date)
+                .datePickerStyle(.graphical)
+                .padding(.horizontal)
+                .navigationTitle("Plan meal")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Cancel") { dismiss() }
+                    }
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Add") {
+                            onPlan(date)
+                            dismiss()
+                        }
+                        .fontWeight(.semibold)
+                    }
+                }
+            Spacer()
+        }
+        .presentationDetents([.medium])
     }
 }

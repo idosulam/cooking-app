@@ -13,6 +13,10 @@ struct HomeView: View {
     @State private var isSettingsPresented = false
     @State private var deleteCandidate: Recipe?
     @Namespace private var recipeTransition
+    @ObservedObject private var router = AppRouter.shared
+    @State private var cookingRecipe: Recipe?
+    @State private var todaysMeal: PlannedMeal?
+    @State private var hasLoaded = false
 
     private let columns = [GridItem(.adaptive(minimum: 145), spacing: 13)]
 
@@ -35,6 +39,7 @@ struct HomeView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     header
+                    todaysMealCard
                     searchBar
                     categoryFilters
                     recipeContent
@@ -45,6 +50,10 @@ struct HomeView: View {
             }
             .background(RecipeTheme.canvas.ignoresSafeArea())
             .refreshable { await viewModel.load() }
+            .onAppear { refreshTodaysMeal() }
+            .onChange(of: navigationPath) { _, _ in refreshTodaysMeal() }
+            .onChange(of: router.pending) { _, _ in handleRouterRequest() }
+            .onChange(of: viewModel.recipes) { _, _ in handleRouterRequest() }
             .navigationBarHidden(true)
             .navigationDestination(for: UUID.self) { recipeID in
                 if let recipe = viewModel.recipes.first(where: { $0.id == recipeID }) {
@@ -76,6 +85,9 @@ struct HomeView: View {
                     .presentationDetents([.medium])
                     .presentationDragIndicator(.visible)
             }
+            .fullScreenCover(item: $cookingRecipe) { recipe in
+                CookingView(recipe: recipe)
+            }
             .alert("Delete recipe?", isPresented: Binding(
                 get: { deleteCandidate != nil },
                 set: { if !$0 { deleteCandidate = nil } }
@@ -90,7 +102,12 @@ struct HomeView: View {
             } message: {
                 Text("This recipe will be removed from your collection.")
             }
-            .task { await viewModel.load() }
+            .task {
+                await viewModel.load()
+                hasLoaded = true
+                refreshTodaysMeal()
+                handleRouterRequest()
+            }
             .alert("Couldn't update recipes", isPresented: Binding(
                 get: {
                     viewModel.errorMessage != nil
@@ -105,6 +122,87 @@ struct HomeView: View {
                 Text(viewModel.errorMessage ?? "")
             }
         }
+    }
+
+    @ViewBuilder
+    private var todaysMealCard: some View {
+        if let meal = todaysMeal {
+            Button {
+                navigationPath = [meal.recipeID]
+                Feedback.tap()
+            } label: {
+                HStack(spacing: 14) {
+                    Image("Category\(meal.category)")
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 30, height: 30)
+                        .foregroundStyle(RecipeTheme.accent)
+                        .frame(width: 54, height: 54)
+                        .background(RecipeTheme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("TODAY’S MEAL")
+                            .font(.caption2.weight(.bold))
+                            .tracking(1.4)
+                            .foregroundStyle(RecipeTheme.accent)
+                        Text(meal.name)
+                            .font(.system(.headline, design: .serif))
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                        Text("\(meal.cookTimeMinutes) min · \(meal.calories) kcal · \(Int(meal.protein.rounded()))g protein")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                    }
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+                .padding(12)
+                .background(RecipeTheme.card, in: RoundedRectangle(cornerRadius: 21, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .transition(.scale(scale: 0.96).combined(with: .opacity))
+        }
+    }
+
+    private func refreshTodaysMeal() {
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+            todaysMeal = MealPlanStore.meal(on: .now)
+        }
+    }
+
+    private func handleRouterRequest() {
+        guard let request = router.pending else { return }
+        func recipe(_ id: UUID) -> Recipe? {
+            viewModel.recipes.first { $0.id == id }
+        }
+        switch request {
+        case .open(let id):
+            guard recipe(id) != nil else {
+                if hasLoaded { router.pending = nil }
+                return
+            }
+            navigationPath = [id]
+        case .cook(let id):
+            guard let found = recipe(id) else {
+                if hasLoaded { router.pending = nil }
+                return
+            }
+            cookingRecipe = found
+        case .cookToday:
+            guard let meal = MealPlanStore.meal(on: .now) else {
+                router.pending = nil
+                return
+            }
+            guard let found = recipe(meal.recipeID) else {
+                if hasLoaded { router.pending = nil }
+                return
+            }
+            cookingRecipe = found
+        }
+        router.pending = nil
     }
 
     private var header: some View {
@@ -429,6 +527,7 @@ private struct SettingsView: View {
                     Button("Sign out", role: .destructive) {
                         Task {
                             if await authService.signOut() {
+                                MealPlanStore.clearAll()
                                 dismiss()
                             }
                         }

@@ -10,10 +10,12 @@
 		0B5507E6490D8A698034E2BA /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1529D2ED0354579066D98AE1 /* Theme.swift */; };
 		0B5D8BC6E1C4B431FA859E04 /* CookingActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948D45315BFE8E83679BCEBB /* CookingActivityAttributes.swift */; };
 		0B76527DB1DE3DEE2FECE378 /* AuthService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0AE812A70AF4297F83EDBC4 /* AuthService.swift */; };
+		17247123EA5D63D3114CB8AD /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5C34890D996EEAC8282BBF /* SharedStore.swift */; };
 		2941C8ED280478FAB9CB2B6B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FAE24FF7E83460B741E114F7 /* Assets.xcassets */; };
 		2C1089F4F35FA767F3E7A270 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B18C02BD7732F1B63AB5C81 /* HomeViewModel.swift */; };
 		2FA5B0CB307C885987EB7F53 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = A35C863A5F434F7D9A2FDFB7 /* Supabase */; };
 		3AA8ECB11370619E16982CDF /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3E779A6B1353431B73C61C4C /* Feedback.swift */; };
+		4200FC86756278BAEB934844 /* SharedStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5C34890D996EEAC8282BBF /* SharedStore.swift */; };
 		50AC0EB20238D8F7DFB76A43 /* CookingLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B71EE21C3EEF3F38BDFE50C /* CookingLiveActivity.swift */; };
 		513CDE8391C49EEBAE2C5779 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F74E0EDB6FCC67DA06D3A37B /* RootView.swift */; };
 		65DD50941A59098720033BCD /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1156C97766D444C1E1F4C781 /* AuthView.swift */; };
@@ -21,13 +23,19 @@
 		7723F21E97C199AAC282CA7D /* CookingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7A8853189DFE6C7214F9DAB /* CookingView.swift */; };
 		78ECDD1ABB80B8207A91F1F6 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118FD7A4F2FF848350E911D9 /* HomeView.swift */; };
 		7C0A8A02E199FCEAE97DFFFB /* RecipesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E87111A328D1AB4E56EA86 /* RecipesApp.swift */; };
+		8A2C6F7AA04FB3BBFD9958FF /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3B40052F26538608C2F4CA25 /* Assets.xcassets */; };
+		8B3C6B0A2EFB9567E35C996A /* AppRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71579AB10B05AFB2E17FDD8B /* AppRouter.swift */; };
+		9A3913708901CC577A9DFCA9 /* CookingIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8380127B1C70006B1C49563 /* CookingIntents.swift */; };
+		9A6759E5F3C6F5D5CFA011AF /* MealPlanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 022EEF7727F45C9969D1329B /* MealPlanner.swift */; };
 		A5D5D64B77354C5D9D2A515B /* CookingActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948D45315BFE8E83679BCEBB /* CookingActivityAttributes.swift */; };
 		B34ABC9BCBB8FA2D3DD41304 /* SupabaseClientProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61598E14A6984C8A6497ADE0 /* SupabaseClientProvider.swift */; };
 		B5EFAF565D69643BD69B7DC1 /* RecipeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25F9C3AEA195B96E6F8F4136 /* RecipeDetailView.swift */; };
 		B88727378CFF3DEB3504442D /* CookingActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53696AC153F80583C4A31D7F /* CookingActivityManager.swift */; };
 		C2D34787CEAA41F3CDD27F96 /* RecipeEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C86CE7D747314E903156C685 /* RecipeEditorView.swift */; };
 		C7D8C9B3CA9A09E3207E7D40 /* RecipesWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CF00EB4176A58520DEFEDBF /* RecipesWidgetBundle.swift */; };
+		C7E568A545503A713124F8F2 /* TodaysMealWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2667C1908B0AC6A73C1F83BA /* TodaysMealWidget.swift */; };
 		CEDF69141BB2EB338AF7A998 /* RecipesWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4DA8600C92E6F3368D31CF9C /* RecipesWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E9809523CEEBD7B9D35F2005 /* TimerNotifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1388768ED978E8B095EE408 /* TimerNotifier.swift */; };
 		EEFE100C8D18087FEF170069 /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8E9697D9A45420A8ECCF2D /* Recipe.swift */; };
 		F6864C8570ECD31FFD126524 /* RecipeRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5887E44CDDBA5FC7D0C3DE2A /* RecipeRepository.swift */; };
 		FED985C69E58E617993D92D7 /* Ingredient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28F2162EC83A3F58670FA01 /* Ingredient.swift */; };
@@ -58,27 +66,35 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		022EEF7727F45C9969D1329B /* MealPlanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealPlanner.swift; sourceTree = "<group>"; };
 		1156C97766D444C1E1F4C781 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		118FD7A4F2FF848350E911D9 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		1529D2ED0354579066D98AE1 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		17CEF0CACDA1533DE714CFF8 /* Recipes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Recipes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		25F9C3AEA195B96E6F8F4136 /* RecipeDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeDetailView.swift; sourceTree = "<group>"; };
+		2667C1908B0AC6A73C1F83BA /* TodaysMealWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodaysMealWidget.swift; sourceTree = "<group>"; };
 		2B18C02BD7732F1B63AB5C81 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		3B40052F26538608C2F4CA25 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3CF00EB4176A58520DEFEDBF /* RecipesWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipesWidgetBundle.swift; sourceTree = "<group>"; };
 		3E779A6B1353431B73C61C4C /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
+		4B5C34890D996EEAC8282BBF /* SharedStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedStore.swift; sourceTree = "<group>"; };
 		4DA8600C92E6F3368D31CF9C /* RecipesWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = RecipesWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		53696AC153F80583C4A31D7F /* CookingActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookingActivityManager.swift; sourceTree = "<group>"; };
 		5887E44CDDBA5FC7D0C3DE2A /* RecipeRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeRepository.swift; sourceTree = "<group>"; };
 		5B71EE21C3EEF3F38BDFE50C /* CookingLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookingLiveActivity.swift; sourceTree = "<group>"; };
 		61598E14A6984C8A6497ADE0 /* SupabaseClientProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClientProvider.swift; sourceTree = "<group>"; };
 		6E8E9697D9A45420A8ECCF2D /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
+		71579AB10B05AFB2E17FDD8B /* AppRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppRouter.swift; sourceTree = "<group>"; };
 		82C6BEEE2B07805E00844E42 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		93E87111A328D1AB4E56EA86 /* RecipesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipesApp.swift; sourceTree = "<group>"; };
 		948D45315BFE8E83679BCEBB /* CookingActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookingActivityAttributes.swift; sourceTree = "<group>"; };
 		AAB293C57FB52F0EEC086F9C /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+		AF8ABD3C779A96EF467AEED0 /* RecipesWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RecipesWidget.entitlements; sourceTree = "<group>"; };
+		B1388768ED978E8B095EE408 /* TimerNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerNotifier.swift; sourceTree = "<group>"; };
 		B28F2162EC83A3F58670FA01 /* Ingredient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ingredient.swift; sourceTree = "<group>"; };
 		C7A8853189DFE6C7214F9DAB /* CookingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookingView.swift; sourceTree = "<group>"; };
 		C86CE7D747314E903156C685 /* RecipeEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeEditorView.swift; sourceTree = "<group>"; };
+		D8380127B1C70006B1C49563 /* CookingIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CookingIntents.swift; sourceTree = "<group>"; };
 		ED87F317C8A7242EF46D74C9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F0AE812A70AF4297F83EDBC4 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
 		F74E0EDB6FCC67DA06D3A37B /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
@@ -120,11 +136,15 @@
 			isa = PBXGroup;
 			children = (
 				FED5469AEF1E48907FE5DBC4 /* AIService.swift */,
+				71579AB10B05AFB2E17FDD8B /* AppRouter.swift */,
 				F0AE812A70AF4297F83EDBC4 /* AuthService.swift */,
 				53696AC153F80583C4A31D7F /* CookingActivityManager.swift */,
+				D8380127B1C70006B1C49563 /* CookingIntents.swift */,
 				3E779A6B1353431B73C61C4C /* Feedback.swift */,
+				022EEF7727F45C9969D1329B /* MealPlanner.swift */,
 				5887E44CDDBA5FC7D0C3DE2A /* RecipeRepository.swift */,
 				61598E14A6984C8A6497ADE0 /* SupabaseClientProvider.swift */,
+				B1388768ED978E8B095EE408 /* TimerNotifier.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -144,9 +164,12 @@
 		89F37C359464D078374059FA /* RecipesWidget */ = {
 			isa = PBXGroup;
 			children = (
+				3B40052F26538608C2F4CA25 /* Assets.xcassets */,
 				5B71EE21C3EEF3F38BDFE50C /* CookingLiveActivity.swift */,
 				ED87F317C8A7242EF46D74C9 /* Info.plist */,
+				AF8ABD3C779A96EF467AEED0 /* RecipesWidget.entitlements */,
 				3CF00EB4176A58520DEFEDBF /* RecipesWidgetBundle.swift */,
+				2667C1908B0AC6A73C1F83BA /* TodaysMealWidget.swift */,
 			);
 			path = RecipesWidget;
 			sourceTree = "<group>";
@@ -172,6 +195,7 @@
 			isa = PBXGroup;
 			children = (
 				948D45315BFE8E83679BCEBB /* CookingActivityAttributes.swift */,
+				4B5C34890D996EEAC8282BBF /* SharedStore.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -218,6 +242,7 @@
 			buildConfigurationList = 8E54AE5AEEF549205269D3E8 /* Build configuration list for PBXNativeTarget "RecipesWidgetExtension" */;
 			buildPhases = (
 				C3F0FD6E9953C4B313DD7C51 /* Sources */,
+				F53C9E7767F6495AE204ED42 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -293,6 +318,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F53C9E7767F6495AE204ED42 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8A2C6F7AA04FB3BBFD9958FF /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -301,23 +334,28 @@
 			buildActionMask = 2147483647;
 			files = (
 				6928F9C16204C460CE71719A /* AIService.swift in Sources */,
+				8B3C6B0A2EFB9567E35C996A /* AppRouter.swift in Sources */,
 				0B76527DB1DE3DEE2FECE378 /* AuthService.swift in Sources */,
 				65DD50941A59098720033BCD /* AuthView.swift in Sources */,
 				A5D5D64B77354C5D9D2A515B /* CookingActivityAttributes.swift in Sources */,
 				B88727378CFF3DEB3504442D /* CookingActivityManager.swift in Sources */,
+				9A3913708901CC577A9DFCA9 /* CookingIntents.swift in Sources */,
 				7723F21E97C199AAC282CA7D /* CookingView.swift in Sources */,
 				3AA8ECB11370619E16982CDF /* Feedback.swift in Sources */,
 				78ECDD1ABB80B8207A91F1F6 /* HomeView.swift in Sources */,
 				2C1089F4F35FA767F3E7A270 /* HomeViewModel.swift in Sources */,
 				FED985C69E58E617993D92D7 /* Ingredient.swift in Sources */,
+				9A6759E5F3C6F5D5CFA011AF /* MealPlanner.swift in Sources */,
 				EEFE100C8D18087FEF170069 /* Recipe.swift in Sources */,
 				B5EFAF565D69643BD69B7DC1 /* RecipeDetailView.swift in Sources */,
 				C2D34787CEAA41F3CDD27F96 /* RecipeEditorView.swift in Sources */,
 				F6864C8570ECD31FFD126524 /* RecipeRepository.swift in Sources */,
 				7C0A8A02E199FCEAE97DFFFB /* RecipesApp.swift in Sources */,
 				513CDE8391C49EEBAE2C5779 /* RootView.swift in Sources */,
+				4200FC86756278BAEB934844 /* SharedStore.swift in Sources */,
 				B34ABC9BCBB8FA2D3DD41304 /* SupabaseClientProvider.swift in Sources */,
 				0B5507E6490D8A698034E2BA /* Theme.swift in Sources */,
+				E9809523CEEBD7B9D35F2005 /* TimerNotifier.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -328,6 +366,8 @@
 				0B5D8BC6E1C4B431FA859E04 /* CookingActivityAttributes.swift in Sources */,
 				50AC0EB20238D8F7DFB76A43 /* CookingLiveActivity.swift in Sources */,
 				C7D8C9B3CA9A09E3207E7D40 /* RecipesWidgetBundle.swift in Sources */,
+				17247123EA5D63D3114CB8AD /* SharedStore.swift in Sources */,
+				C7E568A545503A713124F8F2 /* TodaysMealWidget.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -347,6 +387,7 @@
 			baseConfigurationReference = AAB293C57FB52F0EEC086F9C /* Release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Config/Recipes.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = V6LMMDDWTH;
@@ -371,6 +412,7 @@
 			baseConfigurationReference = 82C6BEEE2B07805E00844E42 /* Debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Config/Recipes.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = V6LMMDDWTH;
@@ -393,6 +435,7 @@
 		75C9E895216E27741B5129C0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = RecipesWidget/RecipesWidget.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = V6LMMDDWTH;
 				INFOPLIST_FILE = RecipesWidget/Info.plist;
@@ -476,6 +519,7 @@
 		9E267EB507FD6448B784A3C7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = RecipesWidget/RecipesWidget.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = V6LMMDDWTH;
 				INFOPLIST_FILE = RecipesWidget/Info.plist;

@@ -2,7 +2,12 @@ import Foundation
 
 @MainActor
 final class HomeViewModel: ObservableObject {
-    @Published private(set) var recipes: [Recipe] = []
+    @Published private(set) var recipes: [Recipe] = [] {
+        didSet {
+            MealPlanner.sync(with: recipes)
+            RecipesShortcuts.updateAppShortcutParameters()
+        }
+    }
     @Published var errorMessage: String?
     @Published private(set) var isLoading = false
 

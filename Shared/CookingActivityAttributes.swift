@@ -7,6 +7,8 @@ struct CookingActivityAttributes: ActivityAttributes {
         var totalSteps: Int
         var instruction: String
         var finished: Bool
+        var timerEnd: Date? = nil      // set while a step timer is running
+        var timerPaused: Int? = nil    // seconds left while a step timer is paused
 
         var progress: Double {
             finished ? 1 : Double(step + 1) / Double(max(totalSteps, 1))

@@ -12,6 +12,17 @@
 	<string>Automatic</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.idosulam.Recipes</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>recipes</string>
+			</array>
+		</dict>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict/>
 </dict>

@@ -9,6 +9,8 @@ struct CookingView: View {
     @State private var currentStep = 0
     @State private var isTimerRunning = false
     @State private var secondsRemaining = 0
+    @State private var timerEndDate: Date?
+    @State private var timerStartedForStep = false
     @State private var direction: CGFloat = 1
     @AppStorage(RecipeAccent.storageKey) private var selectedAccent = RecipeAccent.tomato.rawValue
     @State private var servings: Int
@@ -55,6 +57,7 @@ struct CookingView: View {
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
+            TimerNotifier.cancel()
             CookingActivityManager.shared.end()
         }
         .onChange(of: phase) { _, newPhase in
@@ -69,18 +72,14 @@ struct CookingView: View {
             CookingActivityManager.shared.update(step: newStep)
         }
         .task(id: isTimerRunning) {
-            guard isTimerRunning else { return }
-            while !Task.isCancelled && secondsRemaining > 0 {
-                do {
-                    try await Task.sleep(for: .seconds(1))
-                } catch {
-                    return
-                }
-                secondsRemaining -= 1
+            guard isTimerRunning, let end = timerEndDate else { return }
+            while !Task.isCancelled {
+                secondsRemaining = max(0, Int(end.timeIntervalSinceNow.rounded(.up)))
+                if secondsRemaining == 0 { break }
+                try? await Task.sleep(for: .milliseconds(250))
             }
-            if secondsRemaining == 0 && isTimerRunning {
-                isTimerRunning = false
-                Feedback.timerDone()
+            if !Task.isCancelled && secondsRemaining == 0 && isTimerRunning {
+                completeTimer()
             }
         }
         .gesture(
@@ -100,7 +99,7 @@ struct CookingView: View {
         HStack {
             Button {
                 if phase == .steps {
-                    isTimerRunning = false
+                    stopTimer()
                     phase = .ingredients
                 } else {
                     dismiss()
@@ -374,7 +373,7 @@ struct CookingView: View {
             }
             Spacer()
             Button {
-                isTimerRunning.toggle()
+                toggleTimer()
                 Feedback.tap()
             } label: {
                 Image(systemName: isTimerRunning ? "pause.fill" : "play.fill")
@@ -421,6 +420,50 @@ struct CookingView: View {
         .multilineTextAlignment(.center)
     }
 
+    private func toggleTimer() {
+        if isTimerRunning {
+            if let end = timerEndDate {
+                secondsRemaining = max(0, Int(end.timeIntervalSinceNow.rounded(.up)))
+            }
+            stopTimer()
+        } else {
+            guard secondsRemaining > 0 else { return }
+            let end = Date().addingTimeInterval(TimeInterval(secondsRemaining))
+            timerEndDate = end
+            timerStartedForStep = true
+            isTimerRunning = true
+            TimerNotifier.schedule(
+                at: end,
+                title: "Timer done",
+                body: "\(recipe.name) · step \(currentStep + 1) of \(recipe.steps.count)"
+            )
+        }
+        pushActivity()
+    }
+
+    private func stopTimer() {
+        timerEndDate = nil
+        isTimerRunning = false
+        TimerNotifier.cancel()
+    }
+
+    private func completeTimer() {
+        stopTimer()
+        timerStartedForStep = false
+        Feedback.timerDone()
+        pushActivity()
+    }
+
+    private func pushActivity() {
+        guard phase == .steps else { return }
+        let paused = timerEndDate == nil && timerStartedForStep && secondsRemaining > 0
+        CookingActivityManager.shared.update(
+            step: currentStep,
+            timerEnd: timerEndDate,
+            timerPaused: paused ? secondsRemaining : nil
+        )
+    }
+
     private func startActivity() {
         let accent = RecipeAccent(rawValue: selectedAccent)?.color ?? RecipeAccent.tomato.color
         CookingActivityManager.shared.start(recipe: recipe, step: currentStep, accent: accent)
@@ -428,7 +471,7 @@ struct CookingView: View {
 
     private func advanceStep() {
         guard currentStep < recipe.steps.count else { return }
-        isTimerRunning = false
+        stopTimer()
         if currentStep == recipe.steps.count - 1 {
             phase = .finished
         } else {
@@ -452,7 +495,8 @@ struct CookingView: View {
     }
 
     private func loadTimer(for index: Int) {
-        isTimerRunning = false
+        stopTimer()
+        timerStartedForStep = false
         guard recipe.steps.indices.contains(index) else {
             secondsRemaining = 0
             return

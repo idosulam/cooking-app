@@ -18,6 +18,11 @@ targets:
     sources:
       - path: Sources
       - path: Shared
+    entitlements:
+      path: Config/Recipes.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.idosulam.Recipes
     configFiles:
       Debug: Config/Debug.xcconfig
       Release: Config/Release.xcconfig
@@ -44,6 +49,11 @@ targets:
     sources:
       - path: RecipesWidget
       - path: Shared
+    entitlements:
+      path: RecipesWidget/RecipesWidget.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.idosulam.Recipes
     info:
       path: RecipesWidget/Info.plist
       properties:

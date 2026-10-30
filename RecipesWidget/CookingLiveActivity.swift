@@ -30,6 +30,7 @@ struct CookingLiveActivity: Widget {
                         Text(state.finished ? "Enjoy your meal!" : state.instruction)
                             .font(.subheadline)
                             .lineLimit(2)
+                        StepTimerRow(state: state, isStale: context.isStale, accent: accent)
                         ProgressView(value: state.progress)
                             .tint(accent)
                     }
@@ -38,13 +39,60 @@ struct CookingLiveActivity: Widget {
                 Image(systemName: "flame.fill")
                     .foregroundStyle(accent)
             } compactTrailing: {
-                Text(state.finished ? "Done" : "\(state.step + 1)/\(state.totalSteps)")
-                    .font(.caption.weight(.semibold).monospacedDigit())
+                if let end = state.timerEnd, !context.isStale, end > Date.now {
+                    Text(timerInterval: Date.now...max(end, Date.now), countsDown: true, showsHours: false)
+                        .font(.caption.weight(.semibold).monospacedDigit())
+                        .frame(width: 44)
+                } else {
+                    Text(state.finished ? "Done" : "\(state.step + 1)/\(state.totalSteps)")
+                        .font(.caption.weight(.semibold).monospacedDigit())
+                }
             } minimal: {
-                Image(systemName: "flame.fill")
+                Image(systemName: state.timerEnd != nil ? "timer" : "flame.fill")
                     .foregroundStyle(accent)
             }
             .keylineTint(accent)
+        }
+    }
+}
+
+private struct StepTimerRow: View {
+    let state: CookingActivityAttributes.ContentState
+    let isStale: Bool
+    let accent: Color
+
+    private var isRunning: Bool {
+        guard let end = state.timerEnd else { return false }
+        return !isStale && end > Date.now
+    }
+
+    var body: some View {
+        if let end = state.timerEnd {
+            HStack(spacing: 8) {
+                Image(systemName: isRunning ? "timer" : "bell.fill")
+                    .foregroundStyle(accent)
+                if isRunning {
+                    Text(timerInterval: Date.now...max(end, Date.now), countsDown: true, showsHours: false)
+                        .font(.system(.title3, design: .rounded).weight(.semibold).monospacedDigit())
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                } else {
+                    Text("Time’s up")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+        } else if let paused = state.timerPaused {
+            HStack(spacing: 8) {
+                Image(systemName: "pause.circle.fill")
+                    .foregroundStyle(.secondary)
+                Text(String(format: "%d:%02d", paused / 60, paused % 60))
+                    .font(.system(.title3, design: .rounded).weight(.semibold).monospacedDigit())
+                    .foregroundStyle(.secondary)
+                Text("Paused")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Spacer()
+            }
         }
     }
 }
@@ -72,6 +120,8 @@ private struct LockScreenCookingView: View {
             Text(state.finished ? "Enjoy your meal!" : state.instruction)
                 .font(.subheadline)
                 .lineLimit(2)
+
+            StepTimerRow(state: state, isStale: context.isStale, accent: accent)
 
             ProgressView(value: state.progress)
                 .tint(accent)
