@@ -11,15 +11,7 @@ struct RecipeDetailView: View {
     @State private var isPlanSheetPresented = false
     @State private var planToast: String?
 
-    private var tint: Color {
-        switch recipe.category {
-        case .starter: Color(red: 0.87, green: 0.75, blue: 0.58)
-        case .main: Color(red: 0.68, green: 0.78, blue: 0.68)
-        case .snack: Color(red: 0.94, green: 0.79, blue: 0.47)
-        case .dessert: Color(red: 0.88, green: 0.68, blue: 0.62)
-        case .sauce: Color(red: 0.70, green: 0.79, blue: 0.83)
-        }
-    }
+    private var tint: Color { recipe.category.tint }
 
     var body: some View {
         ScrollView {
@@ -54,6 +46,7 @@ struct RecipeDetailView: View {
             .padding(.bottom, 10)
             .background(.ultraThinMaterial)
         }
+        .zoomDestination(id: recipe.id, in: namespace)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -129,7 +122,7 @@ struct RecipeDetailView: View {
         } else {
             label = "Planned for \(date.formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()))"
         }
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.82)) { planToast = label }
+        withAnimation(Motion.standard) { planToast = label }
         Task {
             try? await Task.sleep(for: .seconds(2))
             withAnimation(.easeOut(duration: 0.3)) { planToast = nil }
@@ -146,20 +139,19 @@ struct RecipeDetailView: View {
                     .frame(width: 190, height: 190)
                     .offset(x: 220, y: 48)
                 CategoryIcon(category: recipe.category, size: 104)
-                    .foregroundStyle(Color.black.opacity(0.68))
+                    .foregroundStyle(recipe.category.iconInk)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 Text(recipe.category.rawValue.uppercased())
                     .font(.caption2.weight(.bold))
                     .tracking(1.4)
-                    .foregroundStyle(.black.opacity(0.66))
+                    .foregroundStyle(recipe.category.iconInk)
                     .padding(.horizontal, 11)
                     .padding(.vertical, 8)
-                    .background(.white.opacity(0.43), in: Capsule())
+                    .background(RecipeTheme.chipFill, in: Capsule())
                     .padding(16)
             }
             .frame(height: 222)
             .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-            .matchedGeometryEffect(id: recipe.id, in: namespace)
 
             Text(recipe.name)
                 .font(.system(.largeTitle, design: .serif).weight(.regular))
@@ -203,9 +195,10 @@ struct RecipeDetailView: View {
             HStack(spacing: 9) {
                 NutritionTile(value: "\(recipe.calories)", unit: "kcal", label: "Energy", tint: RecipeTheme.accent)
                 NutritionTile(value: recipe.protein.formatted(.number.precision(.fractionLength(0...1))), unit: "g", label: "Protein", tint: RecipeTheme.leaf)
-                NutritionTile(value: recipe.fat.formatted(.number.precision(.fractionLength(0...1))), unit: "g", label: "Fat", tint: Color.orange)
-                NutritionTile(value: recipe.carbs.formatted(.number.precision(.fractionLength(0...1))), unit: "g", label: "Carbs", tint: Color.blue)
+                NutritionTile(value: recipe.fat.formatted(.number.precision(.fractionLength(0...1))), unit: "g", label: "Fat", tint: RecipeTheme.fat)
+                NutritionTile(value: recipe.carbs.formatted(.number.precision(.fractionLength(0...1))), unit: "g", label: "Carbs", tint: RecipeTheme.carbs)
             }
+            MacroBar(protein: recipe.protein, fat: recipe.fat, carbs: recipe.carbs)
         }
     }
 
@@ -284,7 +277,7 @@ private struct NutritionTile: View {
                 Text(value).font(.system(.headline, design: .rounded).weight(.semibold).monospacedDigit())
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                Text(unit).font(.system(size: 9, weight: .medium)).foregroundStyle(.secondary)
+                Text(unit).font(.caption2.weight(.medium)).foregroundStyle(.secondary)
             }
             Text(label).font(.caption2).foregroundStyle(.secondary).lineLimit(1)
             Capsule().fill(tint).frame(width: 20, height: 3)

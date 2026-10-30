@@ -277,7 +277,7 @@ struct RecipeEditorView: View {
             }
 
             Button {
-                withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                withAnimation(Motion.standard) {
                     draft.ingredients.append(Ingredient(name: "", quantity: nil, unit: "g"))
                 }
                 Feedback.tap()
@@ -827,7 +827,7 @@ struct RecipeEditorView: View {
     private func moveIngredient(at index: Int, by offset: Int) {
         let destination = index + offset
         guard draft.ingredients.indices.contains(destination), draft.ingredients.indices.contains(index) else { return }
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+        withAnimation(Motion.standard) {
             draft.ingredients.swapAt(index, destination)
         }
         Feedback.tap()

@@ -35,7 +35,7 @@ struct RootView: View {
                 showSplash = false
             }
         }
-        .animation(.spring(response: 0.4, dampingFraction: 0.86), value: authService.session?.user.id)
+        .animation(Motion.standard, value: authService.session?.user.id)
         .tint(accentColor)
         .onAppear { SharedStore.saveAccent(UIColor(accentColor)) }
         .onChange(of: selectedAccent) { _, _ in SharedStore.saveAccent(UIColor(accentColor)) }

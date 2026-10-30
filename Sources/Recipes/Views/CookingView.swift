@@ -9,9 +9,12 @@ struct CookingView: View {
     @State private var currentStep = 0
     @State private var isTimerRunning = false
     @State private var secondsRemaining = 0
+    @State private var timerDuration = 0
+    @ScaledMetric(relativeTo: .largeTitle) private var instructionSize: CGFloat = 36
     @State private var timerEndDate: Date?
     @State private var timerStartedForStep = false
     @State private var direction: CGFloat = 1
+    @State private var finishAppeared = false
     @AppStorage(RecipeAccent.storageKey) private var selectedAccent = RecipeAccent.tomato.rawValue
     @State private var servings: Int
 
@@ -48,6 +51,7 @@ struct CookingView: View {
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .animation(.easeInOut(duration: 0.25), value: phase)
             }
         }
         .statusBarHidden()
@@ -64,7 +68,12 @@ struct CookingView: View {
             switch newPhase {
             case .ingredients: CookingActivityManager.shared.end()
             case .steps: startActivity()
-            case .finished: CookingActivityManager.shared.finish()
+            case .finished:
+                Task {
+                    try? await Task.sleep(for: .milliseconds(450))
+                    CookingActivityManager.shared.finish()
+                    Feedback.finish()
+                }
             }
         }
         .onChange(of: currentStep) { _, newStep in
@@ -164,7 +173,7 @@ struct CookingView: View {
                 VStack(spacing: 9) {
                     ForEach(recipe.ingredients) { ingredient in
                         Button {
-                            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                            withAnimation(Motion.quick) {
                                 if checkedIngredients.contains(ingredient.id) {
                                     checkedIngredients.remove(ingredient.id)
                                 } else {
@@ -281,6 +290,18 @@ struct CookingView: View {
         return CGFloat(checkedIngredients.count) / CGFloat(recipe.ingredients.count)
     }
 
+    private var stepIngredients: [Ingredient] {
+        let text = currentInstruction.lowercased()
+        return recipe.ingredients.filter { ingredient in
+            let name = ingredient.name.lowercased()
+            if text.contains(name) { return true }
+            return name.split(separator: " ").contains { word in
+                let stem = word.hasSuffix("s") ? String(word.dropLast()) : String(word)
+                return stem.count >= 3 && text.contains(stem)
+            }
+        }
+    }
+
     private var stepContent: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
@@ -292,42 +313,55 @@ struct CookingView: View {
                 Text("\(Int(stepProgress * 100))%")
                     .font(.caption.weight(.medium).monospacedDigit())
                     .foregroundStyle(.secondary)
+                    .contentTransition(.numericText())
             }
-            .padding(.top, 35)
+            .padding(.top, 28)
 
             GeometryReader { proxy in
                 ZStack(alignment: .leading) {
                     Capsule().fill(RecipeTheme.card)
-                    Capsule().fill(RecipeTheme.accent).frame(width: proxy.size.width * stepProgress)
+                    Capsule()
+                        .fill(RecipeTheme.accent)
+                        .frame(width: proxy.size.width * stepProgress)
                 }
             }
             .frame(height: 5)
             .padding(.top, 13)
+            .animation(Motion.standard, value: stepProgress)
 
-            Spacer(minLength: 25)
-            Text("Take it one\nstep at a time.")
-                .font(.system(size: 18, weight: .medium, design: .serif))
-                .foregroundStyle(.secondary)
-                .padding(.bottom, 15)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 24) {
+                    Text(currentInstruction)
+                        .font(.system(size: instructionSize, weight: .regular, design: .serif))
+                        .tracking(-0.6)
+                        .lineSpacing(8)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            if currentStep < recipe.steps.count - 1 { advanceStep() }
+                        }
+                        .id(currentStep)
+                        .transition(.asymmetric(
+                            insertion: .move(edge: direction > 0 ? .trailing : .leading).combined(with: .opacity),
+                            removal: .move(edge: direction > 0 ? .leading : .trailing).combined(with: .opacity)
+                        ))
+                        .accessibilityAddTraits(.isHeader)
 
-            Text(currentInstruction)
-                .font(.system(.largeTitle, design: .serif).weight(.regular))
-                .tracking(-0.6)
-                .lineSpacing(7)
-                .fixedSize(horizontal: false, vertical: true)
-                .id(currentStep)
-                .transition(.asymmetric(
-                    insertion: .move(edge: direction > 0 ? .trailing : .leading).combined(with: .opacity),
-                    removal: .move(edge: direction > 0 ? .leading : .trailing).combined(with: .opacity)
-                ))
-                .accessibilityAddTraits(.isHeader)
+                    if !stepIngredients.isEmpty {
+                        stepIngredientList
+                    }
 
-            if secondsRemaining > 0 {
-                timerControl
-                    .padding(.top, 24)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    if secondsRemaining > 0 {
+                        timerControl
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                }
+                .padding(.top, 28)
+                .padding(.bottom, 12)
             }
-            Spacer(minLength: 25)
+            .scrollIndicators(.hidden)
+            .scrollBounceBehavior(.basedOnSize)
 
             HStack(spacing: 12) {
                 Button(action: goBack) {
@@ -341,6 +375,7 @@ struct CookingView: View {
                     .padding(.vertical, 17)
                     .background(RecipeTheme.card, in: Capsule())
                 }
+                .buttonStyle(.pressable)
                 .disabled(currentStep == 0)
                 .opacity(currentStep == 0 ? 0.4 : 1)
 
@@ -355,21 +390,65 @@ struct CookingView: View {
                     .padding(.vertical, 17)
                     .background(RecipeTheme.accent, in: Capsule())
                 }
+                .buttonStyle(.pressable)
             }
+            .padding(.top, 12)
             .padding(.bottom, 22)
         }
         .padding(.horizontal, 22)
     }
 
+    private var stepIngredientList: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("USE IN THIS STEP")
+                .font(.caption2.weight(.bold))
+                .tracking(1.4)
+                .foregroundStyle(.secondary)
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(stepIngredients) { ingredient in
+                        HStack(spacing: 6) {
+                            Text(ingredient.name)
+                                .font(.subheadline.weight(.medium))
+                            Text(quantityDescription(ingredient))
+                                .font(.subheadline.monospacedDigit())
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.horizontal, 13)
+                        .padding(.vertical, 9)
+                        .background(RecipeTheme.card, in: Capsule())
+                    }
+                }
+            }
+        }
+        .transition(.opacity)
+    }
+
     private var timerControl: some View {
-        HStack(spacing: 15) {
-            Image(systemName: "timer")
-                .font(.system(size: 22, weight: .medium))
-                .foregroundStyle(RecipeTheme.accent)
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Step timer").font(.caption.weight(.medium)).foregroundStyle(.secondary)
+        let fraction = timerDuration > 0 ? Double(secondsRemaining) / Double(timerDuration) : 0
+        return HStack(spacing: 18) {
+            ZStack {
+                Circle()
+                    .stroke(RecipeTheme.accent.opacity(0.15), lineWidth: 7)
+                Circle()
+                    .trim(from: 0, to: fraction)
+                    .stroke(RecipeTheme.accent, style: StrokeStyle(lineWidth: 7, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                    .animation(.linear(duration: 0.3), value: fraction)
+                Image(systemName: "timer")
+                    .font(.title3.weight(.medium))
+                    .foregroundStyle(RecipeTheme.accent)
+            }
+            .frame(width: 76, height: 76)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(isTimerRunning ? "Timer running" : "Step timer")
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
                 Text(timerText)
-                    .font(.system(.title2, design: .rounded).weight(.semibold).monospacedDigit())
+                    .font(.system(.largeTitle, design: .rounded).weight(.semibold).monospacedDigit())
+                    .contentTransition(.numericText(countsDown: true))
+                    .animation(.default, value: secondsRemaining)
             }
             Spacer()
             Button {
@@ -377,15 +456,17 @@ struct CookingView: View {
                 Feedback.tap()
             } label: {
                 Image(systemName: isTimerRunning ? "pause.fill" : "play.fill")
-                    .font(.system(size: 15, weight: .semibold))
+                    .font(.title3.weight(.semibold))
+                    .contentTransition(.symbolEffect(.replace))
                     .foregroundStyle(.white)
-                    .frame(width: 44, height: 44)
+                    .frame(width: 56, height: 56)
                     .background(RecipeTheme.accent, in: Circle())
             }
+            .buttonStyle(.pressable)
             .accessibilityLabel(isTimerRunning ? "Pause timer" : "Start timer")
         }
-        .padding(15)
-        .background(RecipeTheme.card, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .padding(16)
+        .background(RecipeTheme.card, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 
     private var timerText: String {
@@ -397,16 +478,28 @@ struct CookingView: View {
     private var finishContent: some View {
         VStack(spacing: 18) {
             Spacer()
-            Image(systemName: "sparkles")
-                .font(.system(size: 44, weight: .light))
-                .foregroundStyle(RecipeTheme.accent)
-                .symbolEffect(.bounce, value: phase == .finished)
+            ZStack {
+                Circle()
+                    .fill(RecipeTheme.accent.opacity(0.12))
+                    .frame(width: 112, height: 112)
+                Image(systemName: "sparkles")
+                    .font(.system(size: 48, weight: .regular))
+                    .foregroundStyle(RecipeTheme.accent)
+            }
+            .scaleEffect(finishAppeared ? 1 : 0.6)
+            .opacity(finishAppeared ? 1 : 0)
+
             Text("Enjoy your meal!")
                 .font(.system(.largeTitle, design: .serif).weight(.regular))
                 .tracking(-0.8)
+                .opacity(finishAppeared ? 1 : 0)
+                .offset(y: finishAppeared ? 0 : 10)
+
             Text("The best part is right now.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+                .opacity(finishAppeared ? 1 : 0)
+
             Spacer()
             Button("Done") { dismiss() }
                 .font(.headline)
@@ -414,10 +507,15 @@ struct CookingView: View {
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 17)
                 .background(RecipeTheme.accent, in: Capsule())
+                .buttonStyle(.pressable)
                 .padding(.bottom, 25)
         }
         .padding(.horizontal, 24)
         .multilineTextAlignment(.center)
+        .onAppear {
+            withAnimation(Motion.playful) { finishAppeared = true }
+        }
+        .onDisappear { finishAppeared = false }
     }
 
     private func toggleTimer() {
@@ -476,18 +574,18 @@ struct CookingView: View {
             phase = .finished
         } else {
             direction = 1
-            withAnimation(.spring(response: 0.38, dampingFraction: 0.86)) {
+            withAnimation(Motion.standard) {
                 currentStep += 1
                 loadTimer(for: currentStep)
             }
+            Feedback.check()
         }
-        Feedback.check()
     }
 
     private func goBack() {
         guard currentStep > 0 else { return }
         direction = -1
-        withAnimation(.spring(response: 0.38, dampingFraction: 0.86)) {
+        withAnimation(Motion.standard) {
             currentStep -= 1
             loadTimer(for: currentStep)
         }
@@ -513,6 +611,7 @@ struct CookingView: View {
         }
         let unit = text[unitRange].lowercased()
         secondsRemaining = value * (unit.hasPrefix("h") ? 3600 : 60)
+        timerDuration = secondsRemaining
     }
 
     private func quantityDescription(_ ingredient: Ingredient) -> String {

@@ -9,6 +9,7 @@ struct RecipesApp: App {
     private let configurationError: String?
 
     init() {
+        Self.configureAppearance()
         do {
             let client = try SupabaseClientProvider.makeClient()
             _authService = StateObject(wrappedValue: AuthService(client: client))
@@ -20,6 +21,13 @@ struct RecipesApp: App {
             _recipeRepository = StateObject(wrappedValue: RecipeRepository(client: nil))
             _aiService = StateObject(wrappedValue: AIService(client: nil))
             configurationError = error.localizedDescription
+        }
+    }
+
+    private static func configureAppearance() {
+        let base = UIFontDescriptor.preferredFontDescriptor(withTextStyle: .largeTitle)
+        if let serif = base.withDesign(.serif) {
+            UINavigationBar.appearance().largeTitleTextAttributes = [.font: UIFont(descriptor: serif, size: 0)]
         }
     }
 

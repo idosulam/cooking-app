@@ -38,15 +38,14 @@ struct HomeView: View {
         NavigationStack(path: $navigationPath) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    header
+                    dateLine
                     todaysMealCard
-                    searchBar
                     categoryFilters
                     recipeContent
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 12)
-                .padding(.bottom, 110)
+                .padding(.top, 4)
+                .padding(.bottom, 32)
             }
             .background(RecipeTheme.canvas.ignoresSafeArea())
             .refreshable { await viewModel.load() }
@@ -54,7 +53,26 @@ struct HomeView: View {
             .onChange(of: navigationPath) { _, _ in refreshTodaysMeal() }
             .onChange(of: router.pending) { _, _ in handleRouterRequest() }
             .onChange(of: viewModel.recipes) { _, _ in handleRouterRequest() }
-            .navigationBarHidden(true)
+            .navigationTitle("Recipes")
+            .navigationBarTitleDisplayMode(.large)
+            .searchable(text: $query, prompt: "Find a favorite")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        isSettingsPresented = true
+                        Feedback.tap()
+                    } label: {
+                        Image(systemName: "person.crop.circle")
+                    }
+                    .accessibilityLabel("Settings")
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(action: presentEditor) {
+                        Image(systemName: "plus")
+                    }
+                    .accessibilityLabel("Add recipe")
+                }
+            }
             .navigationDestination(for: UUID.self) { recipeID in
                 if let recipe = viewModel.recipes.first(where: { $0.id == recipeID }) {
                     RecipeDetailView(
@@ -69,11 +87,6 @@ struct HomeView: View {
                 } else {
                     ContentUnavailableView("Recipe not found", systemImage: "fork.knife")
                 }
-            }
-            .overlay(alignment: .bottomTrailing) {
-                addButton
-                    .padding(.trailing, 22)
-                    .padding(.bottom, 24)
             }
             .sheet(isPresented: $isEditorPresented) {
                 RecipeEditorView(recipe: editingRecipe, aiService: aiService) { recipe in
@@ -162,13 +175,13 @@ struct HomeView: View {
                 .padding(12)
                 .background(RecipeTheme.card, in: RoundedRectangle(cornerRadius: 21, style: .continuous))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.pressable)
             .transition(.scale(scale: 0.96).combined(with: .opacity))
         }
     }
 
     private func refreshTodaysMeal() {
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
+        withAnimation(Motion.standard) {
             todaysMeal = MealPlanStore.meal(on: .now)
         }
     }
@@ -205,55 +218,12 @@ struct HomeView: View {
         router.pending = nil
     }
 
-    private var header: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 7) {
-                Text(Date.now.formatted(.dateTime.weekday(.wide).month(.abbreviated).day()).uppercased())
-                    .font(.caption2.weight(.bold))
-                    .tracking(1.6)
-                    .foregroundStyle(RecipeTheme.accent)
-                Text("Recipes")
-                    .font(.system(.largeTitle, design: .serif).weight(.regular))
-                    .tracking(-1.3)
-                Text("A good thing, made again.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer(minLength: 16)
-            Button {
-                isSettingsPresented = true
-                Feedback.tap()
-            } label: {
-                Image(systemName: "person.crop.circle")
-                    .font(.system(size: 23, weight: .regular))
-                    .foregroundStyle(.primary)
-                    .frame(width: 45, height: 45)
-                    .background(RecipeTheme.card, in: Circle())
-            }
-            .accessibilityLabel("Settings")
-        }
-    }
-
-    private var searchBar: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(.secondary)
-            TextField("Find a favorite", text: $query)
-                .font(.body)
-                .autocorrectionDisabled()
-                .textInputAutocapitalization(.never)
-            if !query.isEmpty {
-                Button {
-                    query = ""
-                } label: {
-                    Image(systemName: "xmark.circle.fill").foregroundStyle(.tertiary)
-                }
-                .accessibilityLabel("Clear search")
-            }
-        }
-        .padding(.horizontal, 15)
-        .frame(height: 50)
-        .background(RecipeTheme.card, in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+    private var dateLine: some View {
+        Text(Date.now.formatted(.dateTime.weekday(.wide).month(.abbreviated).day()).uppercased())
+            .font(.caption2.weight(.bold))
+            .tracking(1.6)
+            .foregroundStyle(RecipeTheme.accent)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var categoryFilters: some View {
@@ -274,10 +244,10 @@ struct HomeView: View {
 
     private func filterChip(_ title: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
         Button {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.78)) {
+            withAnimation(Motion.quick) {
                 action()
             }
-            Feedback.tap()
+            Feedback.selection()
         } label: {
             Text(title)
                 .font(.subheadline.weight(.semibold))
@@ -347,18 +317,6 @@ struct HomeView: View {
         }
     }
 
-    private var addButton: some View {
-        Button(action: presentEditor) {
-            Image(systemName: "plus")
-                .font(.system(size: 21, weight: .semibold))
-                .foregroundStyle(.white)
-                .frame(width: 58, height: 58)
-                .background(RecipeTheme.accent, in: Circle())
-                .shadow(color: RecipeTheme.accent.opacity(0.27), radius: 12, x: 0, y: 7)
-        }
-        .accessibilityLabel("Add recipe")
-    }
-
     private func presentEditor() {
         editingRecipe = nil
         isEditorPresented = true
@@ -373,15 +331,7 @@ private struct RecipeCard: View {
     let action: () -> Void
     @State private var isVisible = false
 
-    private var tint: Color {
-        switch recipe.category {
-        case .starter: Color(red: 0.87, green: 0.75, blue: 0.58)
-        case .main: Color(red: 0.68, green: 0.78, blue: 0.68)
-        case .snack: Color(red: 0.94, green: 0.79, blue: 0.47)
-        case .dessert: Color(red: 0.88, green: 0.68, blue: 0.62)
-        case .sauce: Color(red: 0.70, green: 0.79, blue: 0.83)
-        }
-    }
+    private var tint: Color { recipe.category.tint }
 
     var body: some View {
         Button(action: action) {
@@ -400,17 +350,17 @@ private struct RecipeCard: View {
                         .frame(width: 92, height: 92)
                         .offset(x: 22, y: 22)
                     CategoryIcon(category: recipe.category, size: 48)
-                        .foregroundStyle(Color.black.opacity(0.68))
+                        .foregroundStyle(recipe.category.iconInk)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                     Image(systemName: "arrow.up.right")
                         .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(.black.opacity(0.55))
+                        .foregroundStyle(recipe.category.iconInk.opacity(0.8))
                         .padding(9)
                 }
                 .frame(height: 112)
                 .clipped()
                 .clipShape(RoundedRectangle(cornerRadius: 17, style: .continuous))
-                .matchedGeometryEffect(id: recipe.id, in: namespace)
+                .zoomSource(id: recipe.id, in: namespace)
                 .padding(.bottom, 12)
 
                 Text(recipe.name)
@@ -433,10 +383,13 @@ private struct RecipeCard: View {
                 .minimumScaleFactor(0.8)
                 .padding(.top, 4)
 
-                HStack(spacing: 8) {
-                    MacroMini(label: "P", amount: recipe.protein, color: RecipeTheme.leaf)
-                    MacroMini(label: "F", amount: recipe.fat, color: RecipeTheme.accent)
-                    MacroMini(label: "C", amount: recipe.carbs, color: Color.blue.opacity(0.75))
+                VStack(alignment: .leading, spacing: 6) {
+                    MacroBar(protein: recipe.protein, fat: recipe.fat, carbs: recipe.carbs)
+                    HStack(spacing: 8) {
+                        MacroMini(label: "P", amount: recipe.protein, color: RecipeTheme.protein)
+                        MacroMini(label: "F", amount: recipe.fat, color: RecipeTheme.fat)
+                        MacroMini(label: "C", amount: recipe.carbs, color: RecipeTheme.carbs)
+                    }
                 }
                 .padding(.top, 10)
             }
@@ -445,10 +398,15 @@ private struct RecipeCard: View {
             .opacity(isVisible ? 1 : 0)
             .offset(y: isVisible ? 0 : 11)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.pressable)
+        .scrollTransition(.animated) { content, phase in
+            content
+                .opacity(phase.isIdentity ? 1 : 0.5)
+                .scaleEffect(phase.isIdentity ? 1 : 0.96)
+        }
         .accessibilityLabel("\(recipe.name), \(recipe.cookTimeMinutes) minutes, \(recipe.calories) calories")
         .onAppear {
-            withAnimation(.spring(response: 0.42, dampingFraction: 0.8).delay(Double(min(index, 6)) * 0.045)) {
+            withAnimation(Motion.standard.delay(Double(min(index, 6)) * 0.045)) {
                 isVisible = true
             }
         }
@@ -468,8 +426,9 @@ private struct MacroMini: View {
             Text("\(amount.formatted(.number.precision(.fractionLength(0...1))))g")
                 .foregroundStyle(.secondary)
         }
-        .font(.system(size: 10, weight: .medium))
+        .font(.caption2.weight(.medium))
         .lineLimit(1)
+        .minimumScaleFactor(0.8)
     }
 }
 
@@ -477,6 +436,7 @@ private struct SettingsView: View {
     @ObservedObject var authService: AuthService
     @Environment(\.dismiss) private var dismiss
     @AppStorage(RecipeAccent.storageKey) private var selectedAccent = RecipeAccent.tomato.rawValue
+    @AppStorage(Feedback.soundsKey) private var soundsEnabled = true
 
     var body: some View {
         NavigationStack {
@@ -512,6 +472,9 @@ private struct SettingsView: View {
                         }
                     }
                     .padding(.vertical, 4)
+                }
+                Section("Feedback") {
+                    Toggle("Timer and finish sounds", isOn: $soundsEnabled)
                 }
                 Section {
                     LabeledContent("Signed in as", value: authService.session?.user.email ?? "")
